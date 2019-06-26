@@ -43,7 +43,8 @@ public class Needlepointer {
 		String name = fname.substring(0, fname.length() - 4);
 		String kmeans_output_name = String.format("%s_%02d_kmeans.png", name, k);
 		String fs_dither_output_name = String.format("%s_%02d_dither_fs.png", name, k);
-		String r_dither_output_name = String.format("%s_%02d_dither_r.png", name, k);
+        String r_dither_output_name = String.format("%s_%02d_dither_r.png", name, k);
+        String nearest_output_name = String.format("%s_%02d_nearest.png", name, k);
 		String palette_output_name = String.format("%s_%02d_palette.png", name, k);
 
 		BufferedImage originalImage = ImageIO.read(new File(fname));
@@ -51,8 +52,15 @@ public class Needlepointer {
 
 		/* Scale original image */
 		int wOrig = originalImage.getWidth();
-		int wNew = 18 * wInch;
-		int hNew = (int) Math.round(originalImage.getHeight() * (wNew / (double) wOrig));
+		int wNew, hNew;
+		if(wInch > 0) {
+    		wNew = 18 * wInch;
+    		hNew = (int) Math.round(originalImage.getHeight() * (wNew / (double) wOrig));
+		}
+		else {
+		    wNew = originalImage.getWidth();
+		    hNew = originalImage.getHeight();
+		}
 		ResampleOp resizeOp = new ResampleOp(wNew, hNew);
 		resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
 		BufferedImage scaledImage = resizeOp.filter(originalImage, null);
@@ -84,7 +92,11 @@ public class Needlepointer {
 			}
 		}
 
-		/* FS dither the original source */
+        /* Nearest dither the copy */
+        Pixel nearestImagePx[][] = Nearest.dither_helper(scaledImagePx, pixelPalette);
+        pxToPng(nearest_output_name, nearestImagePx);
+
+        /* FS dither the original source */
 		Pixel fsDitheredImagePx[][] = FSdither.dither_helper(scaledImagePx, pixelPalette);
 		pxToPng(fs_dither_output_name, fsDitheredImagePx);
 
