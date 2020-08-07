@@ -32,14 +32,14 @@ public class Needlepointer {
 		try {
 			generateNeedlepoint(
 					Integer.parseInt(args[1]), /* K clusters */
-					Integer.parseInt(args[2]), /* Width in inches */
+					Integer.parseInt(args[2]), /* Width in pixels, usually 18 pixels per inch */
 					args[0]);                  /* File to needlepoint */
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
 	}
 
-	private static void generateNeedlepoint(int k, int wInch, String fname) throws IOException {
+	private static void generateNeedlepoint(int k, int wPix, String fname) throws IOException {
 		String name = fname.substring(0, fname.length() - 4);
 		String kmeans_output_name = String.format("%s_%02d_kmeans.png", name, k);
 		String fs_dither_output_name = String.format("%s_%02d_dither_fs.png", name, k);
@@ -53,8 +53,8 @@ public class Needlepointer {
 		/* Scale original image */
 		int wOrig = originalImage.getWidth();
 		int wNew, hNew;
-		if(wInch > 0) {
-    		wNew = 18 * wInch;
+		if(wPix > 0) {
+    		wNew = wPix;
     		hNew = (int) Math.round(originalImage.getHeight() * (wNew / (double) wOrig));
 		}
 		else {
